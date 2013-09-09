@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Showing pixel and tile coordinates</title>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
+    <meta charset="utf-8">
+    <style type="text/css">
+          html { height: 100% }
+          body { height: 100%; margin: 0; padding: 0 }
+          #map-canvas { height: 100% }
+        </style>
+    <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
+    <script src="SmoothCurve.js"></script>
+    <script src="drawcurve.js"></script>
+    <script>
+
+    </script>
+  </head>
+  <body>
+
+    <div id="map-canvas"></div>
+    <div id="panel">
+          <input onclick="clearOverlays();" type=button value="Hide Overlays">
+          <input onclick="showOverlays();" type=button value="Show All Overlays">
+          <input onclick="deleteOverlays();" type=button value="Delete Overlays">
+        </div>
+  </body>
+</html>
