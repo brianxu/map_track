@@ -1,4 +1,27 @@
 var markers = [];
+// Create an array of styles.
+  var styles = [
+    {
+      stylers: [
+        { hue: "#00ffe6" },
+        { saturation: -20 }
+      ]
+    },{
+      featureType: "road",
+      elementType: "geometry",
+      stylers: [
+        { lightness: 100 },
+        { visibility: "simplified" }
+      ]
+    },{
+      featureType: "road",
+      elementType: "labels",
+      stylers: [
+        { visibility: "off" }
+      ]
+    }
+  ];
+
 // Add a marker to the map and push to the array.
 function addMarker(location) {
     var marker = new google.maps.Marker({
@@ -97,6 +120,12 @@ function initialize() {
     };
 
     map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+    styledMap = new google.maps.StyledMapType(styles,
+                                              {name: "Styled Map"});
+
+    //Associate the styled map with the MapTypeId and set it to display.
+      map.mapTypes.set('map_style', styledMap);
+      map.setMapTypeId('map_style');
 
     var polyOptions = {
         strokeColor: '#CC0099',
@@ -107,6 +136,50 @@ function initialize() {
     poly.setMap(map);
     // Add a listener for the click event
     google.maps.event.addListener(map, 'click', addLatLng);
+
+    // Search box
+    var input = /** @type {HTMLInputElement} */(document.getElementById('target'));
+    var searchBox = new google.maps.places.SearchBox(input);
+    var markers_search = [];
+
+    google.maps.event.addListener(searchBox, 'places_changed', function() {
+      var places = searchBox.getPlaces();
+
+      for (var i = 0, marker; marker = markers_search[i]; i++) {
+        marker.setMap(null);
+      }
+
+      markers_search = [];
+      var bounds = new google.maps.LatLngBounds();
+      for (var i = 0, place; place = places[i]; i++) {
+        var image = {
+          url: place.icon,
+          size: new google.maps.Size(71, 71),
+          origin: new google.maps.Point(0, 0),
+          anchor: new google.maps.Point(17, 34),
+          scaledSize: new google.maps.Size(25, 25)
+        };
+
+        var marker = new google.maps.Marker({
+          map: map,
+          icon: image,
+          title: place.name,
+          position: place.geometry.location
+        });
+
+        markers_search.push(marker);
+
+        bounds.extend(place.geometry.location);
+      }
+
+      map.fitBounds(bounds);
+      map.setZoom(14);
+    });
+
+    google.maps.event.addListener(map, 'bounds_changed', function() {
+      var bounds = map.getBounds();
+      searchBox.setBounds(bounds);
+    });
 }
 
 /**
@@ -127,9 +200,9 @@ function addLatLng(event) {
     allPoints.push(worldCoordinate);
     //---
     var bpoints = new Array();
-    bpoints = getControlPoints2(allPoints, true, 0.5);
+    bpoints = getBezierPoints(allPoints, false);
     var polypoints = new Array();
-    polypoints = getPolylines(bpoints,60);
+    polypoints = getPolylines(bpoints,40);
     for(var i = 0; i < polypoints.length; ++i)
     {
         var latlng = projection.fromPointToLatLng(polypoints[i]);
@@ -149,5 +222,6 @@ function addLatLng(event) {
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
+
 
 
