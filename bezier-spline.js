@@ -1,16 +1,16 @@
 /* bezier-spline.js
  *
  * computes cubic bezier coefficients to generate a smooth
- * line through specified points. couples with SVG graphics 
+ * line through specified points. couples with SVG graphics
  * for interactive processing.
  *
  * For more info see:
- * http://www.particleincell.com/2012/bezier-splines/ 
+ * http://www.particleincell.com/2012/bezier-splines/
  *
  * Lubos Brieda, Particle In Cell Consulting LLC, 2012
  * you may freely use this algorithm in your codes however where feasible
  * please include a link/reference to the source article
- */ 
+ */
 
 /*saves elements as global variables*/
 function getBezierPoints(points, isClosed)
@@ -24,13 +24,15 @@ function getBezierPoints(points, isClosed)
         x[i] = points[i].x;
         y[i] = points[i].y;
     }
+    var count = 0;
     if(isClosed)
     {
         var size = points.length;
-        for(var i=0;i<size;i++)
+        for(var i=0;i<size && i<4;i++)
         {
             x[size+i] = points[i].x;
             y[size+i] = points[i].y;
+            count++;
         }
 
 
@@ -38,7 +40,7 @@ function getBezierPoints(points, isClosed)
 
     var result = updateSplines(x, y);
     var len = result.length;
-    return result;
+    return isClosed?result.slice(3, len-(count-2)*3):result;
 }
 	
 /*computes spline control points*/
@@ -86,11 +88,11 @@ function computeControlPoints(K)
 	r=new Array();
 	
 	/*left most segment*/
-	a[0]=0;
-	b[0]=2;
-	c[0]=1;
-	r[0] = K[0]+2*K[1];
-	
+    a[0]=0;
+    b[0]=2;
+    c[0]=1;
+    r[0] = K[0]+2*K[1];
+
 	/*internal segments*/
 	for (i = 1; i < n - 1; i++)
 	{
@@ -101,10 +103,10 @@ function computeControlPoints(K)
 	}
 			
 	/*right segment*/
-	a[n-1]=2;
-	b[n-1]=7;
-	c[n-1]=0;
-	r[n-1] = 8*K[n-1]+K[n];
+    a[n-1]=2;
+    b[n-1]=7;
+    c[n-1]=0;
+    r[n-1] = 8*K[n-1]+K[n];
 	
 	/*solves Ax=b with the Thomas algorithm (from Wikipedia)*/
 	for (i = 1; i < n; i++)
